@@ -128,8 +128,19 @@ ENV/
 env.bak/
 venv.bak/
 
+# Environments DEV
+.dev_chat
+.vdev_chat
+dev_chat/
+dev_chat/
+DEV_CHAT/
+dev_chat.bak/
+vdev_chat.bak/
 
 
+data/
+
+databases/
 # Spyder project settings
 .spyderproject
 .spyproject
