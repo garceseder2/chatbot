@@ -121,8 +121,10 @@ celerybeat.pid
 
 # Environments
 .env
+
 .venv
 env/
+
 venv/
 ENV/
 env.bak/
@@ -139,8 +141,10 @@ vdev_chat.bak/
 
 
 data/
-
 databases/
+config.json
+/envrepair/
+
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -155,7 +159,6 @@ databases/
 .mypy_cache/
 .dmypy.json
 dmypy.json
-
 # Pyre type checker
 .pyre/
 
