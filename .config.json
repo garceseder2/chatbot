@@ -1,0 +1,16 @@
+{
+    "app_name": "",
+    "version": "",
+    "api_integration_llm": "",
+    "vectorial_database": {
+      "path": "",
+      "name": "",
+      "model":""
+    },
+    "llm": {
+        "model":"",
+        "api_key":""
+    }
+
+  }
+  
