@@ -144,6 +144,7 @@ data/
 databases/
 config.json
 /envrepair/
+/TEST/
 
 # Spyder project settings
 .spyderproject
