@@ -1,12 +1,13 @@
 import os
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
+#from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import SentenceTransformerEmbeddings
 from langchain_openai import ChatOpenAI
-from langchain_community.vectorstores import Chroma
 from langchain.chains import RetrievalQAWithSourcesChain, ConversationalRetrievalChain, RetrievalQA
 from rich.console import Console
 #from langchain_community.embeddings import SentenceTransformerEmbeddings
 from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEndpoint
 
 console = Console()
 
@@ -20,6 +21,21 @@ vdb_config = config.vectorial_database
 
 embeddings_st = HuggingFaceEmbeddings(model_name=vdb_config['model'])
 vectorstore_chroma = Chroma(persist_directory=vdb_config['path'], embedding_function=embeddings_st)
+
+
+llm_used = config.api_integration_llm
+llm_config = config.llm
+
+llm=None
+
+if (llm_used=="openia"):
+     llm = ChatOpenAI(openai_api_key=llm_config['api_key'], model_name=llm_config['model'], temperature=0.2, max_tokens=512)
+elif(llm_used=="huggingface"):
+     llm = HuggingFaceEndpoint(repo_id=llm_config['model'], temperature=0.2, huggingfacehub_api_token=llm_config['api_key'], max_new_tokens=512)
+else:
+     llm:None
+
+
 
 
 def get_query_from_user() -> str:
@@ -81,26 +97,23 @@ def get_query_from_user() -> str:
 
 
 
-def conversation_qa(chat_type, llm, query)-> dict:
+def conversation_qa(query)-> dict:
     retriever_chroma = vectorstore_chroma.as_retriever(search_kwargs={'k': 3})
-    response = process_qa_query(query=query.query, retriever=retriever_chroma, llm=llm)
+    response = process_qa_query(query=query.query, retriever=retriever_chroma)
     return response
 
 
 
-def conversation_history(chat_type, llm, query, chat_history):
+def conversation_history(query, chat_history):
     retriever_chroma = vectorstore_chroma.as_retriever(search_kwargs={'k': 3})
-    response = process_memory_query(query=query.question, retriever=retriever_chroma, llm=llm, chat_history=chat_history)
+    response = process_memory_query(query=query.question, retriever=retriever_chroma, chat_history=chat_history)
     return response
 
 
-def search_key(query):
-    retriever_chroma = vectorstore_chroma.as_retriever(search_kwargs={'k': 5})
-    ##response = process_memory_query(query=query.question, retriever=retriever_chroma, llm=llm, chat_history=chat_history)
-    return retriever_chroma.invoke(query)
 
 
-def process_memory_query(query, retriever, llm, chat_history):
+
+def process_memory_query(query, retriever, chat_history):
     conversation = ConversationalRetrievalChain.from_llm(
         llm=llm, retriever=retriever, verbose=False
     )
@@ -111,7 +124,7 @@ def process_memory_query(query, retriever, llm, chat_history):
     return result
 
 
-def process_qa_query(query, retriever, llm):
+def process_qa_query(query, retriever):
 
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm, chain_type="stuff", retriever=retriever, verbose=False
